@@ -2,7 +2,8 @@ import './style.css'
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import * as dat from 'dat.gui'
-import gsap from 'gsap'
+import * as CANNON from 'cannon-es'
+import {OBJLoader} from 'three/examples/jsm/loaders/OBJLoader'
 
 //link to DOM Element
 const canvas = document.querySelector('.webgl')
@@ -17,6 +18,43 @@ const gui = new dat.GUI({width:300})
 const fog = new THREE.Fog(0x400880, 60, 100)
 scene.fog = fog
 
+//Physics World
+const world = new CANNON.World()
+world.gravity.set(0, -9.82, 0)
+world.broadphase = new CANNON.SAPBroadphase(world)
+world.allowSleep = true
+
+const defaultMaterial = new CANNON.Material('default')
+const defaultContactMaterial = new CANNON.ContactMaterial(
+    defaultMaterial,
+    defaultMaterial,
+    {
+        friction: 0.1,
+        restitution: 0.325
+    }
+)
+world.addContactMaterial(defaultContactMaterial)
+world.defaultContactMaterial = defaultContactMaterial
+
+//Cannon.js plane
+const floorShape = new CANNON.Plane()
+const floorBody = new CANNON.Body({
+    mass: 0,
+    shape: floorShape,
+    material: defaultMaterial
+})
+floorBody.quaternion.setFromAxisAngle(new CANNON.Vec3(-1, 0, 0), Math.PI * 0.5)
+world.addBody(floorBody)
+
+// // Three.js plane
+// const plane = new THREE.Mesh(
+//     new THREE.PlaneBufferGeometry(8, 8),
+//     new THREE.MeshStandardMaterial()
+// )
+// scene.add(plane)
+// plane.rotation.x = -Math.PI * 0.5
+// plane.receiveShadow = true
+
 //instantiate raycaster
 const raycaster = new THREE.Raycaster()
 let currentIntersect = null
@@ -25,11 +63,11 @@ let currentIntersect = null
 //font loader
 const fontLoader = new THREE.FontLoader()
 fontLoader.load(
-    'https://cdn.skypack.dev/three/examples/fonts/droid/droid_sans_regular.typeface.json',
+    'https://cdn.skypack.dev/three/examples/fonts/helvetiker_bold.typeface.json',
     (font) => {
         console.log('loaded')
         const textGeometry = new THREE.TextGeometry(
-            'Tic Tac Toe', {
+            'TIC TAC TOE', {
                 font: font,
                 size: 8,
                 height: 2,
@@ -47,7 +85,7 @@ fontLoader.load(
         const text = new THREE.Mesh(textGeometry, textMaterial)
         scene.add(text)
         textMaterial.color = new THREE.Color(0xffcc00)
-        text.position.set(0, 0, -30)
+        text.position.set(-2, 0, -30)
         text.rotation.x = -(Math.PI * 0.5)
     }
 )
@@ -90,9 +128,19 @@ grid2.castShadow = true
 grid3.castShadow = true
 grid4.castShadow = true
 
+//cannon.js grid
+const grid1Shape = new CANNON.Box(0.3, 1.5, 15)
+const grid1Body = new CANNON.Body({
+    mass: 10,
+    position: new CANNON.Vec3(0, 1.5, 0),
+    shape: grid1Shape,
+    material: defaultMaterial
+})
+world.addBody(grid1Body)
+
 
 //test Boxes
-const boxGeometry = new THREE.BoxGeometry(8, 8, 8)
+const boxGeometry = new THREE.BoxGeometry(8, 2, 8)
 const boxMaterial = new THREE.MeshStandardMaterial({
     wireframe: true,
     color: 0xff0000
@@ -106,15 +154,15 @@ const boxMidRight = new THREE.Mesh(boxGeometry, boxMaterial)
 const boxBottomLeft = new THREE.Mesh(boxGeometry, boxMaterial)
 const boxBottomMid = new THREE.Mesh(boxGeometry, boxMaterial)
 const boxBottomRight = new THREE.Mesh(boxGeometry, boxMaterial)
-boxTopLeft.position.set(-14, 4, -10)
-boxTopMid.position.set(-4.5, 4, -10)
-boxTopRight.position.set(5, 4, -10)
-boxMidLeft.position.set(-14, 4, 0)
-boxMidMid.position.set(-4.5, 4, 0)
-boxMidRight.position.set(5, 4, 0)
-boxBottomLeft.position.set(-14, 4, 10)
-boxBottomMid.position.set(-4.5, 4, 10)
-boxBottomRight.position.set(5, 4, 10)
+boxTopLeft.position.set(-14, 2, -10)
+boxTopMid.position.set(-4.5, 2, -10)
+boxTopRight.position.set(5, 2, -10)
+boxMidLeft.position.set(-14, 2, 0)
+boxMidMid.position.set(-4.5, 2, 0)
+boxMidRight.position.set(5, 2, 0)
+boxBottomLeft.position.set(-14, 2, 10)
+boxBottomMid.position.set(-4.5, 2, 10)
+boxBottomRight.position.set(5, 2, 10)
 scene.add(boxTopLeft, boxTopMid, boxTopRight, boxMidLeft, boxMidMid, boxMidRight, boxBottomLeft, boxBottomMid, boxBottomRight)
 gui.add(boxMaterial, 'visible')
 //create camera
@@ -175,7 +223,7 @@ renderer.setClearColor(0x400880)
 renderer.shadowMap.enabled = true
 renderer.shadowMap.type = THREE.PCFSoftShadowMap
 
-
+const objLoader = new OBJLoader()
 
 //mouse
 const mouse = new THREE.Vector2()
@@ -186,6 +234,8 @@ window.addEventListener('mousemove', (event) => {
     //console.log(mouse)
 })
 
+let oMeshes = new Array()
+let oBodies = new Array()
 
 //add event listener for mouse
 window.addEventListener('click', () => {
@@ -195,6 +245,46 @@ window.addEventListener('click', () => {
         {
             case boxTopLeft:
                 console.log('click on object TL')
+                
+                objLoader.load(
+                    '/obj/o.obj',
+                    (object) => {
+                        console.log('o loaded')
+                        const oMesh = object.children[0]
+                        oMesh.material = new THREE.MeshStandardMaterial()
+                        oMesh.castShadow = true
+
+                        const createO = () => {
+                            for(let i = 0; i < 50; i++){
+                            const oClone = oMesh.clone()
+                            oClone.position.x = (Math.random() - 0.5)-14
+                            oClone.position.z = (Math.random() - 0.5)-10
+                            oClone.position.y = 20 + i
+
+                            scene.add(oClone)
+                            oMeshes.push(oClone)
+
+                            const oBody = new CANNON.Body({mass: 1})
+                            oBody.addShape(new CANNON.Sphere(.05), new CANNON.Vec3(0.5, 0, 0))
+                            oBody.addShape(new CANNON.Sphere(.05), new CANNON.Vec3(0, 0, 0.5))
+                            oBody.addShape(new CANNON.Sphere(.05), new CANNON.Vec3(-0.5, 0, 0))
+                            oBody.addShape(new CANNON.Sphere(.05), new CANNON.Vec3(0, 0, -0.5))
+                            oBody.addShape(new CANNON.Sphere(.05), new CANNON.Vec3(0, 0, -0.38))
+                            oBody.addShape(new CANNON.Sphere(.05), new CANNON.Vec3(0.4, 0.1, 0))
+                            oBody.addShape(new CANNON.Sphere(.05), new CANNON.Vec3(0.4, -0.1, 0))
+                            oBody.addShape(new CANNON.Sphere(.05), new CANNON.Vec3(0, -0.1, 0.4))
+                            oBody.addShape(new CANNON.Sphere(.05), new CANNON.Vec3(0, -0.1, -0.4))
+                            
+                            oBody.position.x = oClone.position.x
+                            oBody.position.y = oClone.position.y
+                            oBody.position.z = oClone.position.z
+                            world.addBody(oBody)
+                            oBodies.push(oBody)
+                            }
+                        }
+                        createO()   
+                    }
+                )
                 break
 
             case boxTopMid:
@@ -241,8 +331,32 @@ window.addEventListener('resize', () => {
     renderer.setSize(window.innerWidth, window.innerHeight)
 })
 
+//Clock
+const clock = new THREE.Clock()
+let oldElapsedTime = 0
+
 //updater function
 const updater = () => {
+    const elapsedTime = clock.getElapsedTime()
+    const deltaTime = elapsedTime - oldElapsedTime
+    oldElapsedTime = elapsedTime
+
+    world.step(1/60, deltaTime, 3)
+
+    oMeshes.forEach((m, i) => {
+        m.position.set(
+            oBodies[i].position.x,
+            oBodies[i].position.y,
+            oBodies[i].position.z
+        )
+        m.quaternion.set(
+            oBodies[i].quaternion.x,
+            oBodies[i].quaternion.y,
+            oBodies[i].quaternion.z,
+            oBodies[i].quaternion.w
+        )
+    })
+
     //raycaster
     raycaster.setFromCamera(mouse, camera)
     const objectsToTest = [boxTopLeft, boxTopMid, boxTopRight, boxMidLeft, boxMidMid, boxMidRight, boxBottomLeft, boxBottomMid, boxBottomRight]
