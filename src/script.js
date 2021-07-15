@@ -8,6 +8,15 @@ import cannonDebugger from 'cannon-es-debugger'
 //link to DOM Element
 const canvas = document.querySelector('.webgl')
 
+//game Logic
+let array = [
+                [5, 5, 5],
+                [5, 5, 5],
+                [5, 5, 5]
+            ]
+
+let currentTurn = 'O'
+
 //create scene
 const scene = new THREE.Scene()
 
@@ -21,10 +30,10 @@ world.gravity.set(0, -9.82, 0)
 world.broadphase = new CANNON.SAPBroadphase(world)
 world.allowSleep = true
 
-// cannonDebugger(scene, world.bodies, {
-//     color: 0xff0000,
-//     autoUpdate: true
-// })
+cannonDebugger(scene, world.bodies, {
+    color: 0xff0000,
+    autoUpdate: true
+})
 
 const defaultMaterial = new CANNON.Material('default')
 const defaultContactMaterial = new CANNON.ContactMaterial(
@@ -167,7 +176,7 @@ rightwallBody.addShape(new CANNON.Box(new CANNON.Vec3(25, 25, 0.1)), new CANNON.
 
 
 //Cannon platform
-const platformShape = new CANNON.Box(new CANNON.Vec3(5, 5, 0.25))
+const platformShape = new CANNON.Box(new CANNON.Vec3(6, 6, 0.25))
 const platformBody = new CANNON.Body({
     mass: 0,
     shape: platformShape,
@@ -204,6 +213,21 @@ horizontalBack.castShadow = true
 horizontalFront.rotation.y = -Math.PI * 0.5
 horizontalFront.position.set(0, 1, 1.5)
 horizontalFront.castShadow = true
+
+//Cannon.js tic tac toe grid
+const gridBody = new CANNON.Body({
+    mass: 0,
+    material: defaultMaterial
+})
+gridBody.addShape(new CANNON.Box(new CANNON.Vec3(0.125, 1, 5)), new CANNON.Vec3(-1.5, 1, 0))
+gridBody.addShape(new CANNON.Box(new CANNON.Vec3(0.125, 1, 5)), new CANNON.Vec3(1.5, 1, 0))
+gridBody.addShape(new CANNON.Box(new CANNON.Vec3(5, 1, 0.125)), new CANNON.Vec3(0, 1, -1.5))
+gridBody.addShape(new CANNON.Box(new CANNON.Vec3(5, 1, 0.125)), new CANNON.Vec3(0, 1, 1.5))
+gridBody.addShape(new CANNON.Box(new CANNON.Vec3(5, 2, 0.125)), new CANNON.Vec3(0, 1, -6))
+gridBody.addShape(new CANNON.Box(new CANNON.Vec3(5, 2, 0.125)), new CANNON.Vec3(0, 1, 6))
+gridBody.addShape(new CANNON.Box(new CANNON.Vec3(0.125, 2, 5)), new CANNON.Vec3(-6, 1, 0))
+gridBody.addShape(new CANNON.Box(new CANNON.Vec3(0.125, 2, 5)), new CANNON.Vec3(6, 1, 0))
+world.addBody(gridBody)
 
 //objects to update
 const oUpdate = []
@@ -306,7 +330,7 @@ createX()
 createO()
 
 //Raycaster Boxes
-const boxGeometry = new THREE.BoxGeometry(1, 1, 1)
+const boxGeometry = new THREE.BoxGeometry(3, 3, 3)
 const boxMaterial = new THREE.MeshStandardMaterial({
     wireframe: true,
     color: 0xff0000
@@ -322,6 +346,17 @@ const boxBottomMid = new THREE.Mesh(boxGeometry, boxMaterial)
 const boxBottomRight = new THREE.Mesh(boxGeometry, boxMaterial)
 scene.add(boxTopLeft, boxTopMid, boxTopRight, boxMidLeft, boxMidMid, boxMidRight, boxBottomLeft, boxBottomMid, boxBottomRight)
 gui.add(boxMaterial, 'visible')
+
+boxTopLeft.position.set(-3.25, 1.5, -3.25)
+boxTopMid.position.set(0, 1.5, -3.25)
+boxTopRight.position.set(3.25, 1.5, -3.25)
+boxMidLeft.position.set(-3.25, 1.5, 0)
+boxMidMid.position.set(0, 1.5, 0)
+boxMidRight.position.set(3.25, 1.5, 0)
+boxBottomLeft.position.set(-3.25, 1.5, 3.25)
+boxBottomMid.position.set(0, 1.5, 3.25)
+boxBottomRight.position.set(3.25, 1.5, 3.25)
+
 //create camera
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 200)
 camera.position.set(0, 10, 20)
@@ -374,6 +409,81 @@ window.addEventListener('mousemove', (event) => {
     //console.log(mouse)
 })
 
+const torusSmallGeometry = new THREE.TorusGeometry(0.5, 0.25, 64, 64)
+const verticalSmallRectangleShape = new CANNON.Box(new CANNON.Vec3(0.25, 0.75, 0.25))
+const horizontalSmallRectangleShape = new CANNON.Box(new CANNON.Vec3(0.75, 0.25, 0.25))
+const xSmallGeometry = new THREE.BoxGeometry(2, 0.5, 0.5)
+const xSmallMaterial = new THREE.MeshStandardMaterial({color: 0x00ffff})
+const xSmallShape = new CANNON.Box(new CANNON.Vec3(0.9, 0.9, 0.25))
+let x, y, z
+const genSmallO = (x, y, z) => {
+    const torus = new THREE.Mesh(torusSmallGeometry, torusMaterial)
+    scene.add(torus)
+    torus.castShadow = true
+    torus.position.x = x
+    torus.position.z = z
+    torus.position.y = y
+    
+    //Cannon.js Torus
+    const torusBody = new CANNON.Body({
+        mass: 1,
+        material: defaultMaterial
+    })
+    torusBody.addShape(verticalSmallRectangleShape)
+    torusBody.addShape(horizontalSmallRectangleShape)
+    torusBody.addShape(new CANNON.Sphere(0.3), new CANNON.Vec3(0.325, 0.325, 0))
+    torusBody.addShape(new CANNON.Sphere(0.3), new CANNON.Vec3(-0.325, 0.325, 0))
+    torusBody.addShape(new CANNON.Sphere(0.3), new CANNON.Vec3(0.325, -0.325, 0))
+    torusBody.addShape(new CANNON.Sphere(0.3), new CANNON.Vec3(-0.325, -0.325, 0))
+
+    torusBody.position.x = torus.position.x
+    torusBody.position.y = torus.position.y
+    torusBody.position.z = torus.position.z
+    world.addBody(torusBody)
+
+    oUpdate.push({
+        mesh: torus,
+        body: torusBody
+    })
+    scene.remove(boxTopLeft)
+    currentTurn = 'X'
+}
+
+const genSmallX = (x, y, z) => {
+    const xGroup = new THREE.Group()
+    const xLeft = new THREE.Mesh(xSmallGeometry, xSmallMaterial)
+    const xRight = new THREE.Mesh(xSmallGeometry, xSmallMaterial)
+    xGroup.position.x = x
+    xGroup.position.z = z
+    xGroup.position.y = y
+    
+    xLeft.castShadow = true
+    xRight.castShadow = true
+    xLeft.rotation.z = -Math.PI * 0.25
+    xRight.rotation.z = Math.PI * 0.25
+    xGroup.add(xLeft)
+    xGroup.add(xRight)
+    scene.add(xGroup)
+    //Cannon.js X Body
+    
+    const xBody = new CANNON.Body({
+        mass: 1,
+        material: defaultMaterial
+    })
+    xBody.position.x = xGroup.position.x
+    xBody.position.y = xGroup.position.y
+    xBody.position.z = xGroup.position.z
+    xBody.addShape(xSmallShape)
+    world.addBody(xBody)
+    
+    xUpdate.push({
+        mesh: xGroup,
+        body: xBody
+    })
+    scene.remove(boxTopLeft)
+    currentTurn = 'O'
+}
+
 //add event listener for mouse
 window.addEventListener('click', () => {
     if(currentIntersect){
@@ -381,7 +491,13 @@ window.addEventListener('click', () => {
          switch(currentIntersect.object)
         {
             case boxTopLeft:
+                if (currentTurn === 'O'){
+                    genSmallO(-3.25, 5, -3)
+                } if (currentTurn === 'X'){
+                    genSmallX(-3.25, 5, 3)
+                }
                 console.log('click on object TL')
+                console.log(currentTurn)
                 break
 
             case boxTopMid:
