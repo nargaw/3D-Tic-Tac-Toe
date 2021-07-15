@@ -9,13 +9,32 @@ import cannonDebugger from 'cannon-es-debugger'
 const canvas = document.querySelector('.webgl')
 
 //game Logic
-let array = [
-                [5, 5, 5],
-                [5, 5, 5],
-                [5, 5, 5]
-            ]
+const players = ['X', 'O']
+let currentTurn = Math.floor(Math.random() * players.length)
+const array = [
+    ['', '', ''],
+    ['', '', ''],
+    ['', '', '']
+]
 
-let currentTurn = 'O'
+let one = array[0][0]
+let two = array[0][1]
+let three = array[0][2]
+let four = array[1][0]
+let five = array[1][1]
+let six = array[1][2]
+let seven = array[2][0]
+let eight = array[2][1]
+let nine = array[2][2]
+
+const checkWinner = () => {
+    console.log(one + one + one)
+        if (one !== "" || two !== "" || three !== "" || four !== "" || five !== "" || six !== "" || seven !== "" || eight !== "" || nine !== ""){
+            if (one === two && two === three){
+                console.log('winner is' + one)
+            }
+        }
+    }  
 
 //create scene
 const scene = new THREE.Scene()
@@ -480,8 +499,6 @@ const genSmallX = (x, y, z) => {
         mesh: xGroup,
         body: xBody
     })
-    scene.remove(boxTopLeft)
-    currentTurn = 'O'
 }
 
 //add event listener for mouse
@@ -491,45 +508,160 @@ window.addEventListener('click', () => {
          switch(currentIntersect.object)
         {
             case boxTopLeft:
-                if (currentTurn === 'O'){
-                    genSmallO(-3.25, 5, -3)
-                } if (currentTurn === 'X'){
-                    genSmallX(-3.25, 5, 3)
+                if (array[0][0] !== 'X' && array[0][0] !== 'O'){
+                    if (currentTurn === 'O'){
+                    genSmallO(-3.25, 6, -3)
+                    array[0].splice(0, 1, 'O')
+                    currentTurn = 'X'
+                    } else {
+                        genSmallX(-3.25, 6, -3)
+                        array[0].splice(0, 1, 'X')
+                        currentTurn = 'O'
+                    }
+                    console.log('click on object TL')
+                    console.log(currentTurn)
+                    console.log(array)
+                    checkWinner()
                 }
-                console.log('click on object TL')
-                console.log(currentTurn)
                 break
 
             case boxTopMid:
-                console.log('click on object TM')
+                if (array[0][1] !== 'X' && array[0][1] !== 'O'){
+                    if (currentTurn === 'O'){
+                        genSmallO(0, 6, -3)
+                        array[0].splice(1, 1, 'O')
+                        currentTurn = 'X'
+                    } else {
+                        genSmallX(0, 6, -3)
+                        array[0].splice(1, 1, 'X')
+                        currentTurn = 'O'
+                    }
+                    console.log('click on object TM')
+                    console.log(currentTurn)
+                    console.log(array)
+                    checkWinner()
+                }
                 break
 
             case boxTopRight:
-                console.log('click on object TR')
+                if (array[0][2] !== 'X' && array[0][2] !== 'O'){
+                    if (currentTurn === 'O'){
+                        genSmallO(3.25, 6, -3)
+                        array[0].splice(2, 1, 'O')
+                        currentTurn = 'X'
+                    } else {
+                        genSmallX(3.25, 6, -3)
+                        array[0].splice(2, 1, 'X')
+                        currentTurn = 'O'
+                    }
+                    console.log('click on object TR')
+                    console.log(currentTurn)
+                    console.log(array)
+                    checkWinner()
+                }
                 break
 
             case boxMidLeft:
-                console.log('click on object ML')
+                if (array[1][0] !== 'X' && array[1][0] !== 'O'){
+                    if (currentTurn === 'O'){
+                        genSmallO(-3.25, 6, 0)
+                        array[1].splice(0, 1, 'O')
+                        currentTurn = 'X'
+                    } else {
+                        genSmallX(-3.25, 6, 0)
+                        array[1].splice(0, 1, 'X')
+                        currentTurn = 'O'
+                    }
+                    console.log('click on object ML')
+                    console.log(currentTurn)
+                    console.log(array)
+                }    
                 break
 
             case boxMidMid:
-                console.log('click on object MM')
+                if (array[1][1] !== 'X' && array[1][1] !== 'O'){
+                    if (currentTurn === 'O'){
+                        genSmallO(0, 6, 0)
+                        array[1].splice(1, 1, 'O')
+                        currentTurn = 'X'
+                    } else {
+                        genSmallX(0, 6, 0)
+                        array[1].splice(1, 1, 'X')
+                        currentTurn = 'O'
+                    }
+                    console.log('click on object MM')
+                    console.log(currentTurn)
+                    console.log(array)
+                }
                 break
 
             case boxMidRight:
-                console.log('click on object MR')
+                if (array[1][2] !== 'X' && array[1][2] !== 'O'){
+                    if (currentTurn === 'O'){
+                        genSmallO(3.25, 6, 0)
+                        array[1].splice(2, 1, 'O')
+                        currentTurn = 'X'
+                    } else {
+                        genSmallX(3.25, 6, 0)
+                        array[1].splice(2, 1, 'X')
+                        currentTurn = 'O'
+                    }
+                    console.log('click on object MR')
+                    console.log(currentTurn)
+                    console.log(array)
+                    
+                }
                 break
             
             case boxBottomLeft:
-                console.log('click on object BL')
+                if (array[2][0] !== 'X' && array[2][0] !== 'O'){
+                    if (currentTurn === 'O'){
+                        genSmallO(-3.25, 6, 3)
+                        array[2].splice(0, 1, 'O')
+                        currentTurn = 'X'
+                    } else {
+                        genSmallX(-3.25, 6, 3)
+                        array[2].splice(0, 1, 'X')
+                        currentTurn = 'O'
+                    }
+                    console.log('click on object BL')
+                    console.log(currentTurn)
+                    console.log(array)
+                }
                 break
 
             case boxBottomMid:
-                console.log('click on object BM')
+                if (array[2][1] !== 'X' && array[2][1] !== 'O'){
+                    if (currentTurn === 'O'){
+                        genSmallO(0, 6, 3)
+                        array[2].splice(1, 1, 'O')
+                        currentTurn = 'X'
+                    } else {
+                        genSmallX(0, 6, 3)
+                        array[2].splice(1, 1, 'X')
+                        currentTurn = 'O'
+                    }
+                    console.log('click on object BM')
+                    console.log(currentTurn)
+                    console.log(array)
+                }
                 break
 
             case boxBottomRight:
-                console.log('click on object BR')
+                if (array[2][2] !== 'X' && array[2][2] !== 'O'){
+                    if (currentTurn === 'O'){
+                        genSmallO(3.25, 6, 3)
+                        array[2].splice(2, 1, 'O')
+                        currentTurn = 'X'
+                    } else {
+                        genSmallX(3.25, 6, 3)
+                        array[2].splice(2, 1, 'X')
+                        currentTurn = 'O'
+                    }
+                    console.log('click on object BR')
+                    console.log(currentTurn)
+                    console.log(array)
+                }
                 break
             
         }
@@ -589,7 +721,8 @@ const updater = () => {
             
         }
         currentIntersect = null
-    }
+    }  
+
     controls.update()
     renderer.render(scene, camera)
     window.requestAnimationFrame(updater)
