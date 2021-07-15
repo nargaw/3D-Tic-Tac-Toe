@@ -16,26 +16,49 @@ const array = [
     ['', '', ''],
     ['', '', '']
 ]
-
-let one = array[0][0]
-let two = array[0][1]
-let three = array[0][2]
-let four = array[1][0]
-let five = array[1][1]
-let six = array[1][2]
-let seven = array[2][0]
-let eight = array[2][1]
-let nine = array[2][2]
+let winner = ''
 
 const checkWinner = () => {
-    console.log(one + one + one)
-        if (one !== "" || two !== "" || three !== "" || four !== "" || five !== "" || six !== "" || seven !== "" || eight !== "" || nine !== ""){
-            if (one === two && two === three){
-                console.log('winner is' + one)
-            }
-        }
-    }  
+    let one = array[0][0]
+    let two = array[0][1]
+    let three = array[0][2]
+    let four = array[1][0]
+    let five = array[1][1]
+    let six = array[1][2]
+    let seven = array[2][0]
+    let eight = array[2][1]
+    let nine = array[2][2]
 
+    if (one !== "" || two !== "" || three !== "" || four !== "" || five !== "" || six !== "" || seven !== "" || eight !== "" || nine !== "" && winner!== 'O' && winner!=='X'){
+        console.log("tictactoe")
+        if (one === two && two === three && one === three){
+            console.log('winner is ' + one)
+            winner = one
+        } else if (one === four && four === seven && one === seven){
+            console.log('winner is ' + one)
+            winner = one
+        } else if (one === five && five === nine && one === nine){
+            console.log('winner is ' + one)
+            winner = one
+        } else if (five === four && four === six && six === five){
+            console.log('winner is ' + four)
+            winner = four
+        } else if (seven === eight && seven === nine && eight === nine){
+            console.log('winner is ' + seven)
+            winner = seven
+        } else if (two === five && five === eight && two === eight){
+            console.log('winner is ' + two)
+            winner = two
+        } else if (three === six && three === nine && six === nine){
+            console.log('winner is ' + three)
+            winner = three
+        } else if (three === five && five === seven && three === seven){
+            console.log('winner is ' + three)
+            winner = three
+        } 
+    }
+}
+ 
 //create scene
 const scene = new THREE.Scene()
 
@@ -49,10 +72,10 @@ world.gravity.set(0, -9.82, 0)
 world.broadphase = new CANNON.SAPBroadphase(world)
 world.allowSleep = true
 
-cannonDebugger(scene, world.bodies, {
-    color: 0xff0000,
-    autoUpdate: true
-})
+// cannonDebugger(scene, world.bodies, {
+//     color: 0xff0000,
+//     autoUpdate: true
+// })
 
 const defaultMaterial = new CANNON.Material('default')
 const defaultContactMaterial = new CANNON.ContactMaterial(
@@ -100,6 +123,37 @@ fontLoader.load(
         text.castShadow = true
     }
 )
+
+const displayWinner = () => {
+    if (winner === 'O' || winner === 'X'){
+        fontLoader.load('https://raw.githubusercontent.com/nargaw/3D-Tic-Tac-Toe/master/static/fonts/Artista%202.0/Arista%202.0_Regular.typeface.json',
+        (font) => {
+            console.log('loaded')
+            const textGeometry = new THREE.TextGeometry(
+                'The Winner is: ' + winner, {
+                    font: font,
+                    size: 5,
+                    height: 2,
+                    curveSegments: 24,
+                    bevelEnabled: true,
+                    bevelThickness: 0.05,
+                    bevelSize: 0.02,
+                    bevelOffset: 0,
+                    bevelSegments: 12
+                }
+            )
+            textGeometry.computeBoundingBox()
+            textGeometry.center()
+            const textMaterial = new THREE.MeshStandardMaterial()
+            const text = new THREE.Mesh(textGeometry, textMaterial)
+            scene.add(text)
+            textMaterial.color = new THREE.Color(0xffcc00)
+            text.position.set(0, 0, 0)
+            //text.rotation.z = Math.PI * 0.1
+            text.castShadow = true
+        })
+    }
+}
 
 //Three.js plane
 const planeGeometry = new THREE.PlaneBufferGeometry(50, 50)
@@ -386,9 +440,9 @@ const ambientLight = new THREE.AmbientLight(0xffffff, 0.2)
 scene.add(ambientLight)
 //gui.add(ambientLight, 'intensity').min(0).max(1).step(0.001).name('Ambient Light Intensity')
 
-const pointLightBack = new THREE.PointLight(0xffffff, 0.5, 100, 0.1)
-const pointLightLeft = new THREE.PointLight(0xffffff, 0.3, 100, 0.1)
-const pointLightRight = new THREE.PointLight(0xffffff, 0.3, 100, 0.1)
+const pointLightBack = new THREE.PointLight(0xffffff, 0.4, 100, 0.1)
+const pointLightLeft = new THREE.PointLight(0xffffff, 0.2, 100, 0.1)
+const pointLightRight = new THREE.PointLight(0xffffff, 0.2, 100, 0.1)
 pointLightBack.position.set(0, 20, 0)
 pointLightLeft.position.set(-20, 10, 0)
 pointLightRight.position.set(20, 10, 0)
@@ -505,6 +559,8 @@ const genSmallX = (x, y, z) => {
 window.addEventListener('click', () => {
     if(currentIntersect){
         //console.log('click')
+        console.log(array)
+        
          switch(currentIntersect.object)
         {
             case boxTopLeft:
@@ -513,6 +569,7 @@ window.addEventListener('click', () => {
                     genSmallO(-3.25, 6, -3)
                     array[0].splice(0, 1, 'O')
                     currentTurn = 'X'
+                   
                     } else {
                         genSmallX(-3.25, 6, -3)
                         array[0].splice(0, 1, 'X')
@@ -520,9 +577,9 @@ window.addEventListener('click', () => {
                     }
                     console.log('click on object TL')
                     console.log(currentTurn)
-                    console.log(array)
-                    checkWinner()
+                    //console.log(array)
                 }
+                checkWinner()
                 break
 
             case boxTopMid:
@@ -538,9 +595,11 @@ window.addEventListener('click', () => {
                     }
                     console.log('click on object TM')
                     console.log(currentTurn)
-                    console.log(array)
-                    checkWinner()
+                    //console.log(array)
+                    //checkWinner()
                 }
+                checkWinner()
+                displayWinner()
                 break
 
             case boxTopRight:
@@ -556,9 +615,10 @@ window.addEventListener('click', () => {
                     }
                     console.log('click on object TR')
                     console.log(currentTurn)
-                    console.log(array)
-                    checkWinner()
+                    //console.log(array)
+                    //checkWinner()
                 }
+                checkWinner()
                 break
 
             case boxMidLeft:
@@ -574,8 +634,9 @@ window.addEventListener('click', () => {
                     }
                     console.log('click on object ML')
                     console.log(currentTurn)
-                    console.log(array)
-                }    
+                    //console.log(array)
+                }
+                checkWinner()    
                 break
 
             case boxMidMid:
@@ -591,8 +652,9 @@ window.addEventListener('click', () => {
                     }
                     console.log('click on object MM')
                     console.log(currentTurn)
-                    console.log(array)
+                    //console.log(array)
                 }
+                checkWinner()
                 break
 
             case boxMidRight:
@@ -608,9 +670,10 @@ window.addEventListener('click', () => {
                     }
                     console.log('click on object MR')
                     console.log(currentTurn)
-                    console.log(array)
+                    //console.log(array)
                     
                 }
+                checkWinner()
                 break
             
             case boxBottomLeft:
@@ -626,8 +689,9 @@ window.addEventListener('click', () => {
                     }
                     console.log('click on object BL')
                     console.log(currentTurn)
-                    console.log(array)
+                    //console.log(array)
                 }
+                checkWinner()
                 break
 
             case boxBottomMid:
@@ -643,8 +707,9 @@ window.addEventListener('click', () => {
                     }
                     console.log('click on object BM')
                     console.log(currentTurn)
-                    console.log(array)
+                    //console.log(array)
                 }
+                checkWinner()
                 break
 
             case boxBottomRight:
@@ -660,8 +725,9 @@ window.addEventListener('click', () => {
                     }
                     console.log('click on object BR')
                     console.log(currentTurn)
-                    console.log(array)
+                    //console.log(array)
                 }
+                checkWinner()
                 break
             
         }
@@ -700,7 +766,7 @@ const updater = () => {
         object.mesh.position.copy(object.body.position)
         object.mesh.quaternion.copy(object.body.quaternion)
     }
-
+    //checkWinner()
     //raycaster
     raycaster.setFromCamera(mouse, camera)
     let objectsToTest = [boxTopLeft, boxTopMid, boxTopRight, boxMidLeft, boxMidMid, boxMidRight, boxBottomLeft, boxBottomMid, boxBottomRight]
@@ -722,7 +788,7 @@ const updater = () => {
         }
         currentIntersect = null
     }  
-
+    
     controls.update()
     renderer.render(scene, camera)
     window.requestAnimationFrame(updater)
