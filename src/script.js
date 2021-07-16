@@ -10,7 +10,7 @@ const canvas = document.querySelector('.webgl')
 
 //game Logic
 const players = ['X', 'O']
-let currentTurn = Math.floor(Math.random() * players.length)
+let currentTurn = players[Math.floor(Math.random() * players.length)]
 const array = [
     ['', '', ''],
     ['', '', ''],
@@ -83,7 +83,7 @@ const defaultContactMaterial = new CANNON.ContactMaterial(
     defaultMaterial,
     {
         friction: 0.1,
-        restitution: 0.5
+        restitution: 0.8
     }
 )
 world.addContactMaterial(defaultContactMaterial)
@@ -93,34 +93,102 @@ world.defaultContactMaterial = defaultContactMaterial
 const raycaster = new THREE.Raycaster()
 let currentIntersect = null
 
+const textureLoader = new THREE.TextureLoader()
+const matcapTexture = textureLoader.load('/matcaps/1.png')
+
+
 //font loader
 const fontLoader = new THREE.FontLoader()
 fontLoader.load(
     'https://raw.githubusercontent.com/nargaw/3D-Tic-Tac-Toe/master/static/fonts/Artista%202.0/Arista%202.0_Regular.typeface.json',
     (font) => {
-        console.log('loaded')
-        const textGeometry = new THREE.TextGeometry(
-            '3D TIC TAC TOE', {
+        const textMaterial = new THREE.MeshMatcapMaterial({matcap: matcapTexture})
+        textMaterial.color = new THREE.Color(0xffcc00)
+        const text3DGeometry = new THREE.TextGeometry(
+            '3D', {
                 font: font,
-                size: 5,
+                size: 8,
                 height: 2,
-                curveSegments: 24,
+                curveSegments: 4,
                 bevelEnabled: true,
                 bevelThickness: 0.05,
                 bevelSize: 0.02,
                 bevelOffset: 0,
-                bevelSegments: 12
+                bevelSegments: 4
             }
         )
-        textGeometry.computeBoundingBox()
-        textGeometry.center()
-        const textMaterial = new THREE.MeshStandardMaterial()
-        const text = new THREE.Mesh(textGeometry, textMaterial)
-        scene.add(text)
-        textMaterial.color = new THREE.Color(0xffcc00)
-        text.position.set(0, 0, -25)
-        //text.rotation.z = Math.PI * 0.1
-        text.castShadow = true
+        
+        const textTicGeometry = new THREE.TextGeometry(
+            'TIC', {
+                font: font,
+                size: 8,
+                height: 2,
+                curveSegments: 4,
+                bevelEnabled: true,
+                bevelThickness: 0.05,
+                bevelSize: 0.02,
+                bevelOffset: 0,
+                bevelSegments: 4
+            }
+        )
+        const textTacGeometry = new THREE.TextGeometry(
+            'TAC', {
+                font: font,
+                size: 8,
+                height: 2,
+                curveSegments: 4,
+                bevelEnabled: true,
+                bevelThickness: 0.05,
+                bevelSize: 0.02,
+                bevelOffset: 0,
+                bevelSegments: 4
+            }
+        )
+        const textToeGeometry = new THREE.TextGeometry(
+            'TOE', {
+                font: font,
+                size: 8,
+                height: 2,
+                curveSegments: 4,
+                bevelEnabled: true,
+                bevelThickness: 0.05,
+                bevelSize: 0.02,
+                bevelOffset: 0,
+                bevelSegments: 4
+            }
+        )
+
+        text3DGeometry.computeBoundingBox()
+        text3DGeometry.center()
+        const text3D = new THREE.Mesh(text3DGeometry, textMaterial)
+        scene.add(text3D)
+        
+        text3D.position.set(0, 16, -25)
+        text3D.castShadow = true
+
+        textTicGeometry.computeBoundingBox()
+        textTicGeometry.center()
+        const textTic = new THREE.Mesh(textTicGeometry, textMaterial)
+        scene.add(textTic)
+        
+        textTic.position.set(0, 6, -25)
+        textTic.castShadow = true
+
+        textTacGeometry.computeBoundingBox()
+        textTacGeometry.center()
+        const textTac = new THREE.Mesh(textTacGeometry, textMaterial)
+        scene.add(textTac)
+        
+        textTac.position.set(0, -4, -25)
+        textTac.castShadow = true
+
+        textToeGeometry.computeBoundingBox()
+        textToeGeometry.center()
+        const textToe = new THREE.Mesh(textToeGeometry, textMaterial)
+        scene.add(textToe)
+        
+        textToe.position.set(0, -14, -25)
+        textToe.castShadow = true
     }
 )
 
@@ -128,32 +196,90 @@ const displayWinner = () => {
     if (winner === 'O' || winner === 'X'){
         fontLoader.load('https://raw.githubusercontent.com/nargaw/3D-Tic-Tac-Toe/master/static/fonts/Artista%202.0/Arista%202.0_Regular.typeface.json',
         (font) => {
-            console.log('loaded')
+            const textMaterial = new THREE.MeshStandardMaterial()
+            textMaterial.color = new THREE.Color(0xffcc00)
+            
             const textGeometry = new THREE.TextGeometry(
                 'The Winner is: ' + winner, {
                     font: font,
                     size: 5,
-                    height: 2,
-                    curveSegments: 24,
+                    height: 1,
+                    curveSegments: 4,
                     bevelEnabled: true,
                     bevelThickness: 0.05,
                     bevelSize: 0.02,
                     bevelOffset: 0,
-                    bevelSegments: 12
+                    bevelSegments: 4
                 }
             )
+            const textWinnerGeometry = new THREE.TextGeometry(
+                winner, {
+                    font: font,
+                    size: 20,
+                    height: 1,
+                    curveSegments: 4,
+                    bevelEnabled: true,
+                    bevelThickness: 0.05,
+                    bevelSize: 0.02,
+                    bevelOffset: 0,
+                    bevelSegments: 4
+                }
+            )
+
             textGeometry.computeBoundingBox()
             textGeometry.center()
-            const textMaterial = new THREE.MeshStandardMaterial()
             const text = new THREE.Mesh(textGeometry, textMaterial)
-            scene.add(text)
-            textMaterial.color = new THREE.Color(0xffcc00)
-            text.position.set(0, 0, 0)
-            //text.rotation.z = Math.PI * 0.1
+
+            textWinnerGeometry.computeBoundingBox()
+            textWinnerGeometry.center()
+            const textWinner = new THREE.Mesh(textWinnerGeometry, textMaterial)
+
+            scene.add(text, textWinner)
+
+            text.position.set(-25, 15, 0)
+            text.rotation.y = Math.PI * 0.5
             text.castShadow = true
+
+            textWinner.position.set(-25, 0, 0)
+            textWinner.rotation.y = Math.PI * 0.5
+            textWinner.castShadow = true
         })
     }
 }
+
+const displayCurrentTurn = () => {
+    fontLoader.load('https://raw.githubusercontent.com/nargaw/3D-Tic-Tac-Toe/master/static/fonts/Artista%202.0/Arista%202.0_Regular.typeface.json',
+        (font) => {
+            const textMaterial = new THREE.MeshStandardMaterial()
+            textMaterial.color = new THREE.Color(0xffcc00)
+            
+            const textCurrentTurnGeometry = new THREE.TextGeometry(
+                currentTurn + ": Goes First", {
+                    font: font,
+                    size: 5,
+                    height: 1,
+                    curveSegments: 4,
+                    bevelEnabled: true,
+                    bevelThickness: 0.05,
+                    bevelSize: 0.02,
+                    bevelOffset: 0,
+                    bevelSegments: 4
+                }
+            )
+
+            textCurrentTurnGeometry.computeBoundingBox()
+            textCurrentTurnGeometry.center()
+            const textCurrentTurn = new THREE.Mesh(textCurrentTurnGeometry, textMaterial)
+        
+            scene.add(textCurrentTurn)
+
+            textCurrentTurn.position.set(25, 5, 0)
+            textCurrentTurn.rotation.y = -Math.PI * 0.5
+            textCurrentTurn.castShadow = true
+    })
+}
+
+displayCurrentTurn()
 
 //Three.js plane
 const planeGeometry = new THREE.PlaneBufferGeometry(50, 50)
@@ -560,41 +686,49 @@ const genSmallX = (x, y, z) => {
 
 //add event listener for mouse
 window.addEventListener('click', () => {
-    if(currentIntersect){
+    if(currentIntersect && winner !== 'X' && winner !== 'O'){
         //console.log('click')
         console.log(array)
         
          switch(currentIntersect.object)
         {
             case boxTopLeft:
+                
                 if (array[0][0] !== 'X' && array[0][0] !== 'O'){
+                    
                     if (currentTurn === 'O'){
-                    genSmallO(-3.25, 6, -3)
-                    array[0].splice(0, 1, 'O')
-                    currentTurn = 'X'
-                   
+                        genSmallO(-3.25, 6, -3)
+                        array[0].splice(0, 1, 'O')
+                        currentTurn = 'X'
+                        
                     } else {
                         genSmallX(-3.25, 6, -3)
                         array[0].splice(0, 1, 'X')
                         currentTurn = 'O'
+              
                     }
                     console.log('click on object TL')
                     console.log(currentTurn)
                     //console.log(array)
                 }
                 checkWinner()
+                displayWinner()
                 break
 
             case boxTopMid:
+                
                 if (array[0][1] !== 'X' && array[0][1] !== 'O'){
+                    
                     if (currentTurn === 'O'){
                         genSmallO(0, 6, -3)
                         array[0].splice(1, 1, 'O')
                         currentTurn = 'X'
+                        
                     } else {
                         genSmallX(0, 6, -3)
                         array[0].splice(1, 1, 'X')
                         currentTurn = 'O'
+                        
                     }
                     console.log('click on object TM')
                     console.log(currentTurn)
@@ -603,14 +737,17 @@ window.addEventListener('click', () => {
                 }
                 checkWinner()
                 displayWinner()
+                
                 break
 
             case boxTopRight:
                 if (array[0][2] !== 'X' && array[0][2] !== 'O'){
+                    
                     if (currentTurn === 'O'){
                         genSmallO(3.25, 6, -3)
                         array[0].splice(2, 1, 'O')
                         currentTurn = 'X'
+                        
                     } else {
                         genSmallX(3.25, 6, -3)
                         array[0].splice(2, 1, 'X')
@@ -622,6 +759,8 @@ window.addEventListener('click', () => {
                     //checkWinner()
                 }
                 checkWinner()
+                displayWinner()
+                //displayCurrentTurn()
                 break
 
             case boxMidLeft:
@@ -630,16 +769,20 @@ window.addEventListener('click', () => {
                         genSmallO(-3.25, 6, 0)
                         array[1].splice(0, 1, 'O')
                         currentTurn = 'X'
+                    
                     } else {
                         genSmallX(-3.25, 6, 0)
                         array[1].splice(0, 1, 'X')
                         currentTurn = 'O'
+                        
                     }
                     console.log('click on object ML')
                     console.log(currentTurn)
                     //console.log(array)
                 }
-                checkWinner()    
+                checkWinner()
+                displayWinner()
+                //displayCurrentTurn()    
                 break
 
             case boxMidMid:
@@ -648,16 +791,20 @@ window.addEventListener('click', () => {
                         genSmallO(0, 6, 0)
                         array[1].splice(1, 1, 'O')
                         currentTurn = 'X'
+                        
                     } else {
                         genSmallX(0, 6, 0)
                         array[1].splice(1, 1, 'X')
                         currentTurn = 'O'
+                        
                     }
                     console.log('click on object MM')
                     console.log(currentTurn)
                     //console.log(array)
                 }
                 checkWinner()
+                displayWinner()
+                //displayCurrentTurn()
                 break
 
             case boxMidRight:
@@ -666,10 +813,12 @@ window.addEventListener('click', () => {
                         genSmallO(3.25, 6, 0)
                         array[1].splice(2, 1, 'O')
                         currentTurn = 'X'
+                        
                     } else {
                         genSmallX(3.25, 6, 0)
                         array[1].splice(2, 1, 'X')
                         currentTurn = 'O'
+                        
                     }
                     console.log('click on object MR')
                     console.log(currentTurn)
@@ -677,6 +826,8 @@ window.addEventListener('click', () => {
                     
                 }
                 checkWinner()
+                displayWinner()
+                //displayCurrentTurn()
                 break
             
             case boxBottomLeft:
@@ -685,16 +836,20 @@ window.addEventListener('click', () => {
                         genSmallO(-3.25, 6, 3)
                         array[2].splice(0, 1, 'O')
                         currentTurn = 'X'
+                        
                     } else {
                         genSmallX(-3.25, 6, 3)
                         array[2].splice(0, 1, 'X')
                         currentTurn = 'O'
+                        
                     }
                     console.log('click on object BL')
                     console.log(currentTurn)
                     //console.log(array)
                 }
                 checkWinner()
+                displayWinner()
+                //displayCurrentTurn()
                 break
 
             case boxBottomMid:
@@ -703,16 +858,20 @@ window.addEventListener('click', () => {
                         genSmallO(0, 6, 3)
                         array[2].splice(1, 1, 'O')
                         currentTurn = 'X'
+                        
                     } else {
                         genSmallX(0, 6, 3)
                         array[2].splice(1, 1, 'X')
                         currentTurn = 'O'
+                        
                     }
                     console.log('click on object BM')
                     console.log(currentTurn)
                     //console.log(array)
                 }
                 checkWinner()
+                displayWinner()
+                //displayCurrentTurn()
                 break
 
             case boxBottomRight:
@@ -721,16 +880,20 @@ window.addEventListener('click', () => {
                         genSmallO(3.25, 6, 3)
                         array[2].splice(2, 1, 'O')
                         currentTurn = 'X'
+                        
                     } else {
                         genSmallX(3.25, 6, 3)
                         array[2].splice(2, 1, 'X')
                         currentTurn = 'O'
+                        
                     }
                     console.log('click on object BR')
                     console.log(currentTurn)
                     //console.log(array)
                 }
                 checkWinner()
+                displayWinner()
+                //displayCurrentTurn()
                 break
             
         }
