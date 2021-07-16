@@ -83,7 +83,7 @@ const defaultContactMaterial = new CANNON.ContactMaterial(
     defaultMaterial,
     {
         friction: 0.1,
-        restitution: 0.8
+        restitution: 0.5
     }
 )
 world.addContactMaterial(defaultContactMaterial)
@@ -403,7 +403,7 @@ createX()
 createO()
 
 //Raycaster Boxes
-const boxGeometry = new THREE.BoxGeometry(3, 3, 3)
+const boxGeometry = new THREE.BoxGeometry(3, 2, 3)
 const boxMaterial = new THREE.MeshStandardMaterial({
     wireframe: true,
     color: 0xff0000
@@ -420,15 +420,15 @@ const boxBottomRight = new THREE.Mesh(boxGeometry, boxMaterial)
 scene.add(boxTopLeft, boxTopMid, boxTopRight, boxMidLeft, boxMidMid, boxMidRight, boxBottomLeft, boxBottomMid, boxBottomRight)
 gui.add(boxMaterial, 'visible')
 
-boxTopLeft.position.set(-3.25, 1.5, -3.25)
-boxTopMid.position.set(0, 1.5, -3.25)
-boxTopRight.position.set(3.25, 1.5, -3.25)
-boxMidLeft.position.set(-3.25, 1.5, 0)
-boxMidMid.position.set(0, 1.5, 0)
-boxMidRight.position.set(3.25, 1.5, 0)
-boxBottomLeft.position.set(-3.25, 1.5, 3.25)
-boxBottomMid.position.set(0, 1.5, 3.25)
-boxBottomRight.position.set(3.25, 1.5, 3.25)
+boxTopLeft.position.set(-3.25, 1, -3.25)
+boxTopMid.position.set(0, 1, -3.25)
+boxTopRight.position.set(3.25, 1, -3.25)
+boxMidLeft.position.set(-3.25, 1, 0)
+boxMidMid.position.set(0, 1, 0)
+boxMidRight.position.set(3.25, 1, 0)
+boxBottomLeft.position.set(-3.25, 1, 3.25)
+boxBottomMid.position.set(0, 1, 3.25)
+boxBottomRight.position.set(3.25, 1, 3.25)
 
 //create camera
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 200)
@@ -497,6 +497,7 @@ const genSmallO = (x, y, z) => {
     torus.position.z = z
     torus.position.y = y
     
+    
     //Cannon.js Torus
     const torusBody = new CANNON.Body({
         mass: 1,
@@ -512,6 +513,7 @@ const genSmallO = (x, y, z) => {
     torusBody.position.x = torus.position.x
     torusBody.position.y = torus.position.y
     torusBody.position.z = torus.position.z
+    
     world.addBody(torusBody)
 
     oUpdate.push({
@@ -546,6 +548,7 @@ const genSmallX = (x, y, z) => {
     xBody.position.x = xGroup.position.x
     xBody.position.y = xGroup.position.y
     xBody.position.z = xGroup.position.z
+    
     xBody.addShape(xSmallShape)
     world.addBody(xBody)
     
