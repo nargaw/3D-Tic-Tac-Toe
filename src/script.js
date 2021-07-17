@@ -93,17 +93,13 @@ world.defaultContactMaterial = defaultContactMaterial
 const raycaster = new THREE.Raycaster()
 let currentIntersect = null
 
-const textureLoader = new THREE.TextureLoader()
-const matcapTexture = textureLoader.load('/matcaps/1.png')
-
-
 //font loader
 const fontLoader = new THREE.FontLoader()
 fontLoader.load(
     'https://raw.githubusercontent.com/nargaw/3D-Tic-Tac-Toe/master/static/fonts/Artista%202.0/Arista%202.0_Regular.typeface.json',
     (font) => {
-        const textMaterial = new THREE.MeshMatcapMaterial({matcap: matcapTexture})
-        textMaterial.color = new THREE.Color(0xffcc00)
+        const textMaterial = new THREE.MeshStandardMaterial()
+        textMaterial.color = new THREE.Color(0xffe45e)
         const text3DGeometry = new THREE.TextGeometry(
             '3D', {
                 font: font,
@@ -192,15 +188,100 @@ fontLoader.load(
     }
 )
 
+fontLoader.load(
+    'https://raw.githubusercontent.com/nargaw/3D-Tic-Tac-Toe/master/static/fonts/Artista%202.0/Arista%202.0_Regular.typeface.json',
+    (font) => {
+        const textRightWallMaterial = new THREE.MeshStandardMaterial()
+        textRightWallMaterial.color = new THREE.Color(0xffe45e)
+        const textRightOneGeometry = new THREE.TextGeometry(
+            'This project was made', {
+                font: font,
+                size: 3,
+                height: 2,
+                curveSegments: 4,
+                bevelEnabled: true,
+                bevelThickness: 0.05,
+                bevelSize: 0.02,
+                bevelOffset: 0,
+                bevelSegments: 4
+
+            }
+        )
+
+        const textRightTwoGeometry = new THREE.TextGeometry(
+            'using Three.Js', {
+                font: font,
+                size: 3,
+                height: 2,
+                curveSegments: 4,
+                bevelEnabled: true,
+                bevelThickness: 0.05,
+                bevelSize: 0.02,
+                bevelOffset: 0,
+                bevelSegments: 4
+
+            }
+        )
+
+        textRightOneGeometry.computeBoundingBox()
+        textRightOneGeometry.center()
+        const textRightOne = new THREE.Mesh(textRightOneGeometry, textRightWallMaterial)
+        scene.add(textRightOne)
+        
+        textRightOne.position.set(25, 10, 0)
+        textRightOne.rotation.y = -Math.PI * 0.5
+        textRightOne.castShadow = true
+
+        textRightTwoGeometry.computeBoundingBox()
+        textRightTwoGeometry.center()
+        const textRightTwo = new THREE.Mesh(textRightTwoGeometry, textRightWallMaterial)
+        scene.add(textRightTwo)
+        
+        textRightTwo.position.set(25, 3, 0)
+        textRightTwo.rotation.y = -Math.PI * 0.5
+        textRightTwo.castShadow = true
+    }
+)
+
+fontLoader.load(
+    'https://raw.githubusercontent.com/nargaw/3D-Tic-Tac-Toe/master/static/fonts/Artista%202.0/Arista%202.0_Regular.typeface.json',
+    (font) => {
+        const textBackWallMaterial = new THREE.MeshStandardMaterial()
+        textBackWallMaterial.color = new THREE.Color(0x00ffff)
+        const textBackWallGeometry = new THREE.TextGeometry(
+            '@nate_dev_', {
+                font: font,
+                size: 3,
+                height: 2,
+                curveSegments: 4,
+                bevelEnabled: true,
+                bevelThickness: 0.05,
+                bevelSize: 0.02,
+                bevelOffset: 0,
+                bevelSegments: 4
+
+            }
+        )
+        textBackWallGeometry.computeBoundingBox()
+        textBackWallGeometry.center()
+        const textBackWall = new THREE.Mesh(textBackWallGeometry, textBackWallMaterial)
+        scene.add(textBackWall)
+        
+        textBackWall.position.set(0, 5, 25)
+        textBackWall.rotation.y = -Math.PI
+        textBackWall.castShadow = true
+    }
+)
+
+
 const displayWinner = () => {
     if (winner === 'O' || winner === 'X'){
         fontLoader.load('https://raw.githubusercontent.com/nargaw/3D-Tic-Tac-Toe/master/static/fonts/Artista%202.0/Arista%202.0_Regular.typeface.json',
         (font) => {
             const textMaterial = new THREE.MeshStandardMaterial()
-            textMaterial.color = new THREE.Color(0xffcc00)
-            
+            textMaterial.color = new THREE.Color(0xffe45e)
             const textGeometry = new THREE.TextGeometry(
-                'The Winner is: ' + winner, {
+                'The Winner is: ', {
                     font: font,
                     size: 5,
                     height: 1,
@@ -247,43 +328,9 @@ const displayWinner = () => {
     }
 }
 
-const displayCurrentTurn = () => {
-    fontLoader.load('https://raw.githubusercontent.com/nargaw/3D-Tic-Tac-Toe/master/static/fonts/Artista%202.0/Arista%202.0_Regular.typeface.json',
-        (font) => {
-            const textMaterial = new THREE.MeshStandardMaterial()
-            textMaterial.color = new THREE.Color(0xffcc00)
-            
-            const textCurrentTurnGeometry = new THREE.TextGeometry(
-                currentTurn + ": Goes First", {
-                    font: font,
-                    size: 5,
-                    height: 1,
-                    curveSegments: 4,
-                    bevelEnabled: true,
-                    bevelThickness: 0.05,
-                    bevelSize: 0.02,
-                    bevelOffset: 0,
-                    bevelSegments: 4
-                }
-            )
-
-            textCurrentTurnGeometry.computeBoundingBox()
-            textCurrentTurnGeometry.center()
-            const textCurrentTurn = new THREE.Mesh(textCurrentTurnGeometry, textMaterial)
-        
-            scene.add(textCurrentTurn)
-
-            textCurrentTurn.position.set(25, 5, 0)
-            textCurrentTurn.rotation.y = -Math.PI * 0.5
-            textCurrentTurn.castShadow = true
-    })
-}
-
-displayCurrentTurn()
-
 //Three.js plane
 const planeGeometry = new THREE.PlaneBufferGeometry(50, 50)
-const planeMaterial = new THREE.MeshStandardMaterial()
+const planeMaterial = new THREE.MeshStandardMaterial({color: 0xff6392})
 const planeFloor = new THREE.Mesh(planeGeometry, planeMaterial)
 const planeRoof = new THREE.Mesh(planeGeometry, planeMaterial)
 const planeRightWall = new THREE.Mesh(planeGeometry, planeMaterial)
@@ -309,7 +356,7 @@ planeBackWall.position.set(0, 0, -25)
 
 const planeFrontWallBox = new THREE.Mesh(
     new THREE.BoxGeometry(50, 50, 1),
-    new THREE.MeshStandardMaterial()
+    new THREE.MeshStandardMaterial({color: 0xff6392})
 )
 scene.add(planeFrontWallBox)
 planeFrontWallBox.position.set(0, 0, 25)
@@ -386,7 +433,7 @@ platformBody.quaternion.setFromAxisAngle(new CANNON.Vec3(-1, 0, 0), Math.PI * 0.
 
 //Three.js platform
 const platformGeometry = new THREE.BoxGeometry(12, 12, 0.5)
-const platformMaterial = new THREE.MeshStandardMaterial()
+const platformMaterial = new THREE.MeshStandardMaterial({color:0x5aa9e6})
 const platform = new THREE.Mesh(platformGeometry, platformMaterial)
 scene.add(platform)
 platform.castShadow = true
@@ -395,7 +442,7 @@ platform.rotation.x = -Math.PI * 0.5
 
 //Three.js tic tac toe grid
 const gridGeometry = new THREE.BoxGeometry(0.25, 2, 10)
-const gridMaterial = new THREE.MeshStandardMaterial()
+const gridMaterial = new THREE.MeshStandardMaterial({color:0x5aa9e6})
 const verticalLeft = new THREE.Mesh(gridGeometry, gridMaterial)
 const verticalRight = new THREE.Mesh(gridGeometry, gridMaterial)
 const horizontalBack = new THREE.Mesh(gridGeometry, gridMaterial)
@@ -434,7 +481,7 @@ const xUpdate = []
 
 //create O
 const torusGeometry = new THREE.TorusGeometry(1, 0.5, 64, 64)
-const torusMaterial = new THREE.MeshStandardMaterial()
+const torusMaterial = new THREE.MeshStandardMaterial({color:0x7fc8f8})
 const verticalRectangleShape = new CANNON.Box(new CANNON.Vec3(0.5, 1.5, 0.5))
 const horizontalRectangleShape = new CANNON.Box(new CANNON.Vec3(1.5, 0.5, 0.5))
 const createO = () => {
@@ -477,7 +524,7 @@ const createO = () => {
 debugObject.createO = () => {
     createO()
 }
-gui.add(debugObject, 'createO').name('Create O')
+//gui.add(debugObject, 'createO').name('Create O')
 
 //create X
 const xGeometry = new THREE.BoxGeometry(4, 1, 1)
@@ -523,7 +570,7 @@ const createX = () => {
 debugObject.createX = () => {
     createX()
 }
-gui.add(debugObject, 'createX').name('Create X')
+//gui.add(debugObject, 'createX').name('Create X')
 
 createX()
 createO()
@@ -531,8 +578,7 @@ createO()
 //Raycaster Boxes
 const boxGeometry = new THREE.BoxGeometry(3, 2, 3)
 const boxMaterial = new THREE.MeshStandardMaterial({
-    wireframe: true,
-    color: 0xff0000
+    visible: false
 })
 const boxTopLeft = new THREE.Mesh(boxGeometry, boxMaterial)
 const boxTopMid = new THREE.Mesh(boxGeometry, boxMaterial)
@@ -544,7 +590,7 @@ const boxBottomLeft = new THREE.Mesh(boxGeometry, boxMaterial)
 const boxBottomMid = new THREE.Mesh(boxGeometry, boxMaterial)
 const boxBottomRight = new THREE.Mesh(boxGeometry, boxMaterial)
 scene.add(boxTopLeft, boxTopMid, boxTopRight, boxMidLeft, boxMidMid, boxMidRight, boxBottomLeft, boxBottomMid, boxBottomRight)
-gui.add(boxMaterial, 'visible')
+//gui.add(boxMaterial, 'visible')
 
 boxTopLeft.position.set(-3.25, 1, -3.25)
 boxTopMid.position.set(0, 1, -3.25)
@@ -585,7 +631,7 @@ pointLightRight.shadow.mapSize.height = 512
 const pointLightHelperBack = new THREE.PointLightHelper(pointLightBack, 1, 0x00ff00)
 const pointLightHelperLeft = new THREE.PointLightHelper(pointLightLeft, 1, 0x00ff00)
 const pointLightHelperRight = new THREE.PointLightHelper(pointLightRight, 1, 0x00ff00)
-scene.add(pointLightHelperBack, pointLightHelperLeft, pointLightHelperRight)
+//scene.add(pointLightHelperBack, pointLightHelperLeft, pointLightHelperRight)
 
 //controls
 const controls = new OrbitControls(camera, canvas)
@@ -646,8 +692,6 @@ const genSmallO = (x, y, z) => {
         mesh: torus,
         body: torusBody
     })
-    scene.remove(boxTopLeft)
-    currentTurn = 'X'
 }
 
 const genSmallX = (x, y, z) => {
@@ -687,80 +731,60 @@ const genSmallX = (x, y, z) => {
 //add event listener for mouse
 window.addEventListener('click', () => {
     if(currentIntersect && winner !== 'X' && winner !== 'O'){
-        //console.log('click')
-        console.log(array)
-        
          switch(currentIntersect.object)
         {
             case boxTopLeft:
-                
                 if (array[0][0] !== 'X' && array[0][0] !== 'O'){
-                    
                     if (currentTurn === 'O'){
                         genSmallO(-3.25, 6, -3)
                         array[0].splice(0, 1, 'O')
                         currentTurn = 'X'
-                        
                     } else {
                         genSmallX(-3.25, 6, -3)
                         array[0].splice(0, 1, 'X')
                         currentTurn = 'O'
-              
                     }
-                    console.log('click on object TL')
-                    console.log(currentTurn)
-                    //console.log(array)
+                    //console.log('click on object TL')
+                    //console.log(currentTurn)
                 }
                 checkWinner()
                 displayWinner()
                 break
 
             case boxTopMid:
-                
                 if (array[0][1] !== 'X' && array[0][1] !== 'O'){
-                    
                     if (currentTurn === 'O'){
                         genSmallO(0, 6, -3)
                         array[0].splice(1, 1, 'O')
                         currentTurn = 'X'
-                        
                     } else {
                         genSmallX(0, 6, -3)
                         array[0].splice(1, 1, 'X')
-                        currentTurn = 'O'
-                        
+                        currentTurn = 'O'   
                     }
-                    console.log('click on object TM')
-                    console.log(currentTurn)
-                    //console.log(array)
-                    //checkWinner()
+                    //console.log('click on object TM')
+                    //console.log(currentTurn)
                 }
                 checkWinner()
                 displayWinner()
-                
                 break
 
             case boxTopRight:
                 if (array[0][2] !== 'X' && array[0][2] !== 'O'){
-                    
                     if (currentTurn === 'O'){
                         genSmallO(3.25, 6, -3)
                         array[0].splice(2, 1, 'O')
-                        currentTurn = 'X'
-                        
+                        currentTurn = 'X' 
                     } else {
                         genSmallX(3.25, 6, -3)
                         array[0].splice(2, 1, 'X')
                         currentTurn = 'O'
                     }
-                    console.log('click on object TR')
-                    console.log(currentTurn)
-                    //console.log(array)
-                    //checkWinner()
+                    //console.log('click on object TR')
+                    //console.log(currentTurn)
                 }
                 checkWinner()
                 displayWinner()
-                //displayCurrentTurn()
                 break
 
             case boxMidLeft:
@@ -769,20 +793,16 @@ window.addEventListener('click', () => {
                         genSmallO(-3.25, 6, 0)
                         array[1].splice(0, 1, 'O')
                         currentTurn = 'X'
-                    
                     } else {
                         genSmallX(-3.25, 6, 0)
                         array[1].splice(0, 1, 'X')
-                        currentTurn = 'O'
-                        
+                        currentTurn = 'O' 
                     }
-                    console.log('click on object ML')
-                    console.log(currentTurn)
-                    //console.log(array)
+                    //console.log('click on object ML')
+                    //console.log(currentTurn)
                 }
                 checkWinner()
-                displayWinner()
-                //displayCurrentTurn()    
+                displayWinner()   
                 break
 
             case boxMidMid:
@@ -791,20 +811,16 @@ window.addEventListener('click', () => {
                         genSmallO(0, 6, 0)
                         array[1].splice(1, 1, 'O')
                         currentTurn = 'X'
-                        
                     } else {
                         genSmallX(0, 6, 0)
                         array[1].splice(1, 1, 'X')
                         currentTurn = 'O'
-                        
                     }
-                    console.log('click on object MM')
-                    console.log(currentTurn)
-                    //console.log(array)
+                    //console.log('click on object MM')
+                    //console.log(currentTurn)
                 }
                 checkWinner()
                 displayWinner()
-                //displayCurrentTurn()
                 break
 
             case boxMidRight:
@@ -813,21 +829,16 @@ window.addEventListener('click', () => {
                         genSmallO(3.25, 6, 0)
                         array[1].splice(2, 1, 'O')
                         currentTurn = 'X'
-                        
                     } else {
                         genSmallX(3.25, 6, 0)
                         array[1].splice(2, 1, 'X')
                         currentTurn = 'O'
-                        
                     }
-                    console.log('click on object MR')
-                    console.log(currentTurn)
-                    //console.log(array)
-                    
+                    //console.log('click on object MR')
+                    //console.log(currentTurn)
                 }
                 checkWinner()
                 displayWinner()
-                //displayCurrentTurn()
                 break
             
             case boxBottomLeft:
@@ -835,21 +846,17 @@ window.addEventListener('click', () => {
                     if (currentTurn === 'O'){
                         genSmallO(-3.25, 6, 3)
                         array[2].splice(0, 1, 'O')
-                        currentTurn = 'X'
-                        
+                        currentTurn = 'X'  
                     } else {
                         genSmallX(-3.25, 6, 3)
                         array[2].splice(0, 1, 'X')
                         currentTurn = 'O'
-                        
                     }
-                    console.log('click on object BL')
-                    console.log(currentTurn)
-                    //console.log(array)
+                    //console.log('click on object BL')
+                    //console.log(currentTurn)
                 }
                 checkWinner()
                 displayWinner()
-                //displayCurrentTurn()
                 break
 
             case boxBottomMid:
@@ -858,20 +865,16 @@ window.addEventListener('click', () => {
                         genSmallO(0, 6, 3)
                         array[2].splice(1, 1, 'O')
                         currentTurn = 'X'
-                        
                     } else {
                         genSmallX(0, 6, 3)
                         array[2].splice(1, 1, 'X')
-                        currentTurn = 'O'
-                        
+                        currentTurn = 'O'   
                     }
-                    console.log('click on object BM')
-                    console.log(currentTurn)
-                    //console.log(array)
+                    //console.log('click on object BM')
+                    //console.log(currentTurn)
                 }
                 checkWinner()
                 displayWinner()
-                //displayCurrentTurn()
                 break
 
             case boxBottomRight:
@@ -879,27 +882,20 @@ window.addEventListener('click', () => {
                     if (currentTurn === 'O'){
                         genSmallO(3.25, 6, 3)
                         array[2].splice(2, 1, 'O')
-                        currentTurn = 'X'
-                        
+                        currentTurn = 'X'    
                     } else {
                         genSmallX(3.25, 6, 3)
                         array[2].splice(2, 1, 'X')
-                        currentTurn = 'O'
-                        
+                        currentTurn = 'O' 
                     }
-                    console.log('click on object BR')
-                    console.log(currentTurn)
-                    //console.log(array)
+                    //console.log('click on object BR')
+                    //console.log(currentTurn)
                 }
                 checkWinner()
                 displayWinner()
-                //displayCurrentTurn()
                 break
             
         }
-    } else {
-        // createX()
-        // createO()
     }
 })
 
@@ -950,7 +946,6 @@ const updater = () => {
         if(currentIntersect)
         {
             //console.log('mouse leave')
-            
         }
         currentIntersect = null
     }  
