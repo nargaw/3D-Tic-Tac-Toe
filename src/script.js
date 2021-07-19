@@ -276,7 +276,7 @@ fontLoader.load(
 
 const displayWinner = () => {
     if (winner === 'O' || winner === 'X'){
-        fontLoader.load('https://raw.githubusercontent.com/nargaw/3D-Tic-Tac-Toe/master/static/fonts/Artista%202.0/Arista%202.0_Regular.typeface.json',
+       fontLoader.load('https://raw.githubusercontent.com/nargaw/3D-Tic-Tac-Toe/master/static/fonts/Artista%202.0/Arista%202.0_Regular.typeface.json',
         (font) => {
             const textMaterial = new THREE.MeshStandardMaterial()
             textMaterial.color = new THREE.Color(0xffe45e)
@@ -566,6 +566,14 @@ const createX = () => {
     }   
 }
 
+//add to GUI
+const reset = () => {
+  window.location = window.location.href
+}
+debugObject.reset = () => {
+    reset()
+}
+gui.add(debugObject, 'reset').name('Reset')
 //add to GUI
 debugObject.createX = () => {
     createX()
